@@ -460,6 +460,8 @@ class Agent(BaseModel):
       gym_dir = './tmp/%s-%s' % (self.env_name, get_time())
       # self.env.env.monitor.start(gym_dir)
       monitor = gym.wrappers.Monitor(self.env.env, gym_dir)
+    else:
+      monitor = self.env.env
 
     best_reward, best_idx = 0, 0
     ep_rewards = []
@@ -479,6 +481,7 @@ class Agent(BaseModel):
         action = self.predict(test_history.get(), test_ep)
         # 2. act
         screen, reward, terminal, _ = monitor.step(action)
+        monitor.render()
         screen = imresize(rgb2gray(screen), (110, 84))
         screen = screen[18:102, :]
         # 3. observe
