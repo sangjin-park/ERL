@@ -1,6 +1,7 @@
 import time
 import cPickle
 import numpy as np
+import pyglet
 import tensorflow as tf
 
 try:
@@ -48,3 +49,21 @@ def load_npy(path):
   obj = np.load(path)
   print("  [*] load %s" % path)
   return obj
+
+
+def my_imshow(window, img, zoom=1):
+  img_width, img_height = img.shape[1], img.shape[0]
+  width = img_width * zoom
+  height = img_height * zoom
+  if zoom != 1:
+    img = imresize(img, (height, width))
+
+  image = pyglet.image.ImageData(width, height, 'RGB', img.tobytes(), pitch=width * -3)
+
+  window.clear()
+  if (width, height) != window.get_size():
+    window.set_size(width, height)
+  window.switch_to()
+  window.dispatch_events()
+  image.blit(0, 0)
+  window.flip()

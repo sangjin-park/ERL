@@ -12,11 +12,13 @@ from .history import History
 from experience_replay import DataSet
 # from .replay_memory import ReplayMemory
 from .ops import linear, conv2d, clipped_error
-from utils import get_time, save_pkl, load_pkl
+from utils import get_time, save_pkl, load_pkl, my_imshow
 from scipy.misc import imresize
 from GatedPixelCNN.func import process_density_images, process_density_input, get_network
 from math import log, exp, pow
 from utils import rgb2gray, imresize
+from gym.envs.atari.atari_env import ACTION_MEANING
+import pyglet
 
 class Agent(BaseModel):
   def __init__(self, config, environment, sess):
@@ -462,6 +464,12 @@ class Agent(BaseModel):
       monitor = gym.wrappers.Monitor(self.env.env, gym_dir)
     else:
       monitor = self.env.env
+      height = 110
+      width = 84
+      window = pyglet.window.Window(width=width, height=height)
+
+      # cv2.startWindowThread()
+      # cv2.namedWindow("view")
 
     best_reward, best_idx = 0, 0
     ep_rewards = []
@@ -481,8 +489,20 @@ class Agent(BaseModel):
         action = self.predict(test_history.get(), test_ep)
         # 2. act
         screen, reward, terminal, _ = monitor.step(action)
-        monitor.render()
+        print t, action, ACTION_MEANING[action], reward
+
+        org_screen = screen
         screen = imresize(rgb2gray(screen), (110, 84))
+        if self.display:
+          monitor.render()
+
+          # img = np.broadcast_to(arr.T, (3, arr.shape[1], arr.shape[0])).T
+          my_imshow(window, org_screen, 3)
+
+          # plt.imshow(screen)
+          # plt.show()
+          # cv2.imshow("view", screen)
+
         screen = screen[18:102, :]
         # 3. observe
         test_history.add(screen)
