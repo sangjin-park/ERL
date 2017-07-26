@@ -1,6 +1,7 @@
 import random
 import tensorflow as tf
 
+import montezuma_simple
 from dqn.agent import Agent
 from dqn.environment import GymEnvironment, SimpleGymEnvironment
 from config import get_config
@@ -14,7 +15,7 @@ flags.DEFINE_boolean('double_q', False, 'Whether to use double q-learning')
 
 # Environment
 #flags.DEFINE_string('env_name', 'Breakout-v0', 'The name of gym environment to use')
-flags.DEFINE_string('env_name', 'MontezumaRevenge-v0', 'The name of gym environment to use')
+flags.DEFINE_string('env_name', 'MontezumaRevenge-v6', 'The name of gym environment to use')
 flags.DEFINE_integer('action_repeat', 4, 'The number of action to be repeated')
 
 # Etc
