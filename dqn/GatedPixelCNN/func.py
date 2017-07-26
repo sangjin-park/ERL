@@ -6,8 +6,8 @@ import time
 
 import numpy as np
 import tensorflow as tf
-from network import Network
-import utils as util
+from .network import Network
+from . import utils as util
 from tqdm import tqdm
 flags = tf.app.flags
 from skimage.transform import resize

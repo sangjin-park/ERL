@@ -40,8 +40,8 @@ class Statistic(object):
     return self.t
 
   def inject_summary(self, tag_dict, t):
-    summary_str_lists = self.sess.run([self.summary_ops[tag] for tag in tag_dict.keys()], {
-      self.summary_placeholders[tag]: value for tag, value in tag_dict.items()
+    summary_str_lists = self.sess.run([self.summary_ops[tag] for tag in list(tag_dict.keys())], {
+      self.summary_placeholders[tag]: value for tag, value in list(tag_dict.items())
     })
     for summary_str in summary_str_lists:
       self.writer.add_summary(summary_str, t)

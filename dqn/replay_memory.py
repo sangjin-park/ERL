@@ -5,7 +5,7 @@ import random
 import logging
 import numpy as np
 
-from utils import save_npy, load_npy
+from .utils import save_npy, load_npy
 
 class ReplayMemory:
   def __init__(self, config, model_dir):
@@ -49,7 +49,7 @@ class ReplayMemory:
       return self.screens[(index - (self.history_length - 1)):(index + 1), ...]
     else:
       # otherwise normalize indexes and use slower list based access
-      indexes = [(index - i) % self.count for i in reversed(range(self.history_length))]
+      indexes = [(index - i) % self.count for i in reversed(list(range(self.history_length)))]
       return self.screens[indexes, ...]
 
   def sample(self):

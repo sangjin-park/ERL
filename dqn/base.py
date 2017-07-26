@@ -44,10 +44,10 @@ class BaseModel(object):
       ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
       fname = os.path.join(self.checkpoint_dir, ckpt_name)
       self.saver.restore(self.sess, fname)
-      print(" [*] Load SUCCESS: %s" % fname)
+      print((" [*] Load SUCCESS: %s" % fname))
       return True
     else:
-      print(" [!] Load FAILED: %s" % self.checkpoint_dir)
+      print((" [!] Load FAILED: %s" % self.checkpoint_dir))
       return False
 
   @property
@@ -57,7 +57,7 @@ class BaseModel(object):
   @property
   def model_dir(self):
     model_dir = self.config.env_name
-    for k, v in self._attrs.items():
+    for k, v in list(self._attrs.items()):
       if not k.startswith('_') and k not in ['display']:
         model_dir += "/%s-%s" % (k, ",".join([str(i) for i in v])
             if type(v) == list else v)

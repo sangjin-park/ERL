@@ -1,5 +1,5 @@
 import time
-import cPickle
+import pickle
 import numpy as np
 import pyglet
 import tensorflow as tf
@@ -19,7 +19,7 @@ def timeit(f):
     result = f(*args, **kwargs)
     end_time = time.time()
 
-    print("   [-] %s : %2.5f sec" % (f.__name__, end_time - start_time))
+    print(("   [-] %s : %2.5f sec" % (f.__name__, end_time - start_time)))
     return result
   return timed
 
@@ -29,25 +29,25 @@ def get_time():
 @timeit
 def save_pkl(obj, path):
   with open(path, 'w') as f:
-    cPickle.dump(obj, f)
-    print("  [*] save %s" % path)
+    pickle.dump(obj, f)
+    print(("  [*] save %s" % path))
 
 @timeit
 def load_pkl(path):
   with open(path) as f:
-    obj = cPickle.load(f)
-    print("  [*] load %s" % path)
+    obj = pickle.load(f)
+    print(("  [*] load %s" % path))
     return obj
 
 @timeit
 def save_npy(obj, path):
   np.save(path, obj)
-  print("  [*] save %s" % path)
+  print(("  [*] save %s" % path))
 
 @timeit
 def load_npy(path):
   obj = np.load(path)
-  print("  [*] load %s" % path)
+  print(("  [*] load %s" % path))
   return obj
 
 _windows = {}
@@ -62,7 +62,7 @@ def my_imshow(window, img, zoom=1):
   image = pyglet.image.ImageData(width, height, 'RGB', img.tobytes(), pitch=width * -3)
 
   if type(window) != pyglet.window.Window:
-    if not _windows.has_key(window):
+    if window not in _windows:
       _window = pyglet.window.Window(width=width, height=height)
       _windows[window] = _window
     window = _windows[window]

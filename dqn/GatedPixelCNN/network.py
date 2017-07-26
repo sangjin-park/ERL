@@ -2,8 +2,8 @@ from logging import getLogger
 
 import tensorflow as tf
 
-from ops import *
-from utils import *
+from .ops import *
+from .utils import *
 
 logger = getLogger(__name__)
 
@@ -34,7 +34,7 @@ class Network:
     net = conv(self.inputs, conf.gated_conv_num_feature_maps, [7, 7], "A", num_channels, scope="CONV_IN")
     
     # main gated layers
-    for idx in xrange(conf.gated_conv_num_layers):
+    for idx in range(conf.gated_conv_num_layers):
       scope = 'GATED_CONV%d' % idx
       net = gated_conv(net, [1, 1], num_channels, scope=scope)
       logger.info("Building %s" % scope)

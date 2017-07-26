@@ -1,14 +1,14 @@
 import numpy as np
 import tensorflow as tf
 
-from ops import conv
+from .ops import conv
 
 def run(op):
   with tf.Session() as sess:
     tf.initialize_all_variables().run()
     outputs = sess.run(op)    
-    print("outputs shape: {}:".format(outputs.shape))
-    print(np.transpose(outputs, axes=(0,3,1,2))[0,:,:,:])
+    print(("outputs shape: {}:".format(outputs.shape)))
+    print((np.transpose(outputs, axes=(0,3,1,2))[0,:,:,:]))
     return outputs
 
 def create_inputs(image_shape, num_inputs):

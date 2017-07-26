@@ -9,9 +9,9 @@ import tensorflow as tf
 import gym
 import core.data.cifar_data as cifar
 import core.data.mnist_data as mnist
-from network import Network
-from statistic import Statistic
-import utils as util
+from .network import Network
+from .statistic import Statistic
+from . import utils as util
 from tqdm import tqdm
 
 flags = tf.app.flags
@@ -127,14 +127,14 @@ def train(env, network, stat, sample_dir):
 
         # 1. train
         total_train_costs = []
-        for _ in tqdm(xrange(train_step_per_epoch)):
+        for _ in tqdm(range(train_step_per_epoch)):
             images = collect_samples(conf.batch_size, env, action_n)
             cost = network.test(images, with_update=True)
             total_train_costs.append(cost)
 
         # 2. test
         total_test_costs = []
-        for _ in tqdm(xrange(test_step_per_epoch)):
+        for _ in tqdm(range(test_step_per_epoch)):
             images = collect_samples(conf.batch_size, env, action_n)
             cost = network.test(images, with_update=False)
             total_test_costs.append(cost)

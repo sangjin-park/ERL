@@ -1,13 +1,14 @@
 import tensorflow as tf
 # util is used for AE
-from util import conv2d, linear
+from .util import conv2d, linear
 from scipy.misc import imsave
 import time
 import numpy as np
 from tqdm import tqdm
-from base import BaseModel
-from simple_replay_memory import SimpleReplayMemory
+from .base import BaseModel
+from .simple_replay_memory import SimpleReplayMemory
 import random
+from functools import reduce
 
 # default NHWC
 # input is resized to 42x42x1
@@ -45,7 +46,7 @@ class VAE(BaseModel):
     def train(self, samples_generator):
         # Using train loss as the standard is suitable ?
         gen_loss_list = []
-        tmp = samples_generator.next()
+        tmp = next(samples_generator)
         for batch in samples_generator:
             batch = batch/255.
             _, gen_loss = self.sess.run([self.vae_optim, self.generation_loss],
@@ -58,7 +59,7 @@ class VAE(BaseModel):
             imsave(time.strftime("./fuck/%d%H%M%S")+"%i.jpg"% i, g[i].reshape(42,42))
         # dynamic could be better.
         self.avg_vae_loss = np.mean(gen_loss_list)
-        print "update the avg_ae_loss",self.avg_vae_loss
+        print("update the avg_ae_loss",self.avg_vae_loss)
         # if dynamic
         # if self.avg_vae_loss:
         #   self.avg_vae_loss = 0.98 * self.avg_vae_loss + 0.02 * np.mean(gen_loss_list)
@@ -174,7 +175,7 @@ class VAE(BaseModel):
             #                                                data_format="NHWC", activation_fn=tf.nn.sigmoid,
             #                                                weights_initializer=initializer,
             #                                                biases_initializer=tf.constant_initializer(0.0), scope="d3")
-            print d2.get_shape().as_list(), "d2"
+            print(d2.get_shape().as_list(), "d2")
 
         return d2
 

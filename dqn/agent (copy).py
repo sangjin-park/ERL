@@ -11,8 +11,9 @@ from .base import BaseModel
 from .history import History
 from .replay_memory import ReplayMemory
 from .ops import linear, conv2d, clipped_error
-from utils import get_time, save_pkl, load_pkl
+from .utils import get_time, save_pkl, load_pkl
 from scipy.misc import imresize
+from functools import reduce
 class Agent(BaseModel):
   def __init__(self, config, environment, sess, ae):
     super(Agent, self).__init__(config)
@@ -48,7 +49,7 @@ class Agent(BaseModel):
     for _ in range(self.history_length):
       self.history.add(screen)
 
-    for self.step in tqdm(range(start_step, self.max_step), ncols=70, initial=start_step):
+    for self.step in tqdm(list(range(start_step, self.max_step)), ncols=70, initial=start_step):
       if self.step == self.learn_start:
         num_game, self.update_count, ep_reward = 0, 0, 0.
         total_reward, self.total_loss, self.total_q = 0., 0., 0.
@@ -142,8 +143,8 @@ class Agent(BaseModel):
           except:
             max_ep_reward, min_ep_reward, avg_ep_reward = 0, 0, 0
 
-          print '\navg_r: %.4f, avg_l: %.6f, avg_q: %3.6f, avg_ep_r: %.4f, max_ep_r: %.4f, min_ep_r: %.4f, # game: %d' \
-              % (avg_reward, avg_loss, avg_q, avg_ep_reward, max_ep_reward, min_ep_reward, num_game)
+          print('\navg_r: %.4f, avg_l: %.6f, avg_q: %3.6f, avg_ep_r: %.4f, max_ep_r: %.4f, min_ep_r: %.4f, # game: %d' \
+              % (avg_reward, avg_loss, avg_q, avg_ep_reward, max_ep_reward, min_ep_reward, num_game))
 
           if max_avg_ep_reward * 0.9 <= avg_ep_reward:
             self.step_assign_op.eval({self.step_input: self.step + 1})
@@ -338,7 +339,7 @@ class Agent(BaseModel):
 
       q_summary = []
       avg_q = tf.reduce_mean(self.q, 0)
-      for idx in xrange(self.env.action_size):
+      for idx in range(self.env.action_size):
         q_summary.append(tf.summary.histogram('q/%s' % idx, avg_q[idx]))
       self.q_summary = tf.summary.merge(q_summary, 'q_summary')
 
@@ -390,7 +391,7 @@ class Agent(BaseModel):
       self.t_w_input = {}
       self.t_w_assign_op = {}
 
-      for name in self.w.keys():
+      for name in list(self.w.keys()):
         self.t_w_input[name] = tf.placeholder('float32', self.t_w[name].get_shape().as_list(), name=name)
         self.t_w_assign_op[name] = self.t_w[name].assign(self.t_w_input[name])
 
@@ -439,20 +440,20 @@ class Agent(BaseModel):
 
     tf.initialize_all_variables().run()
 
-    self._saver = tf.train.Saver(self.w.values() + [self.step_op], max_to_keep=30)
+    self._saver = tf.train.Saver(list(self.w.values()) + [self.step_op], max_to_keep=30)
 
     self.load_model()
     self.update_target_q_network()
 
   def update_target_q_network(self):
-    for name in self.w.keys():
+    for name in list(self.w.keys()):
       self.t_w_assign_op[name].eval({self.t_w_input[name]: self.w[name].eval()})
 
   def save_weight_to_pkl(self):
     if not os.path.exists(self.weight_dir):
       os.makedirs(self.weight_dir)
 
-    for name in self.w.keys():
+    for name in list(self.w.keys()):
       save_pkl(self.w[name].eval(), os.path.join(self.weight_dir, "%s.pkl" % name))
 
   def load_weight_from_pkl(self, cpu_mode=False):
@@ -460,18 +461,18 @@ class Agent(BaseModel):
       self.w_input = {}
       self.w_assign_op = {}
 
-      for name in self.w.keys():
+      for name in list(self.w.keys()):
         self.w_input[name] = tf.placeholder('float32', self.w[name].get_shape().as_list(), name=name)
         self.w_assign_op[name] = self.w[name].assign(self.w_input[name])
 
-    for name in self.w.keys():
+    for name in list(self.w.keys()):
       self.w_assign_op[name].eval({self.w_input[name]: load_pkl(os.path.join(self.weight_dir, "%s.pkl" % name))})
 
     self.update_target_q_network()
 
   def inject_summary(self, tag_dict, step):
-    summary_str_lists = self.sess.run([self.summary_ops[tag] for tag in tag_dict.keys()], {
-      self.summary_placeholders[tag]: value for tag, value in tag_dict.items()
+    summary_str_lists = self.sess.run([self.summary_ops[tag] for tag in list(tag_dict.keys())], {
+      self.summary_placeholders[tag]: value for tag, value in list(tag_dict.items())
     })
     for summary_str in summary_str_lists:
       self.writer.add_summary(summary_str, self.step)
@@ -488,7 +489,7 @@ class Agent(BaseModel):
       monitor = gym.wrappers.Monitor(self.env.env, gym_dir)
 
     best_reward, best_idx = 0, 0
-    for idx in tqdm(xrange(n_episode),ncols=70):
+    for idx in tqdm(range(n_episode),ncols=70):
       screen, reward, action, terminal = self.env.new_random_game()
       current_reward = 0
 
@@ -511,9 +512,9 @@ class Agent(BaseModel):
         best_reward = current_reward
         best_idx = idx
 
-    print "="*30
-    print " [%d] Best reward : %d" % (best_idx, best_reward)
-    print "="*30
+    print("="*30)
+    print(" [%d] Best reward : %d" % (best_idx, best_reward))
+    print("="*30)
 
     if not self.display:
       monitor.close()

@@ -3,7 +3,7 @@ logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%m-%d %H:%M:%S"
 
 import os
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import pprint
 import tarfile
 import tensorflow as tf
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def mprint(matrix, pivot=0.5):
   for array in matrix:
-    print "".join("#" if i > pivot else " " for i in array)
+    print("".join("#" if i > pivot else " " for i in array))
 
 def show_all_variables():
   total_count = 0
@@ -58,7 +58,7 @@ def get_model_dir(config, exceptions=None):
   attrs = config.__dict__['__flags']
   pp(attrs)
 
-  keys = attrs.keys()
+  keys = list(attrs.keys())
   keys.sort()
   keys.remove('data')
   keys = ['data'] + keys
@@ -74,7 +74,7 @@ def get_model_dir(config, exceptions=None):
 def preprocess_conf(conf):
   options = conf.__flags
 
-  for option, value in options.items():
+  for option, value in list(options.items()):
     option = option.lower()
 
 def check_and_create_dir(directory):
