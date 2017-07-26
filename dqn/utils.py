@@ -50,15 +50,22 @@ def load_npy(path):
   print("  [*] load %s" % path)
   return obj
 
-
+_windows = {}
 def my_imshow(window, img, zoom=1):
+
   img_width, img_height = img.shape[1], img.shape[0]
   width = img_width * zoom
   height = img_height * zoom
   if zoom != 1:
-    img = imresize(img, (height, width))
+    img = imresize(img, (height, width), 'nearest')
 
   image = pyglet.image.ImageData(width, height, 'RGB', img.tobytes(), pitch=width * -3)
+
+  if type(window) != pyglet.window.Window:
+    if not _windows.has_key(window):
+      _window = pyglet.window.Window(width=width, height=height)
+      _windows[window] = _window
+    window = _windows[window]
 
   window.clear()
   if (width, height) != window.get_size():

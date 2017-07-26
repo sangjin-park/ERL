@@ -182,6 +182,24 @@ class Agent(BaseModel):
 
     return action
 
+  def predict2(self, s_t, test=False):
+    if test:
+      ep = 0.01
+    else:
+      ep = self.ep_end + max(0., (self.ep_start - self.ep_end)
+          * (self.ep_end_t - max(0., self.step - self.learn_start)) / self.ep_end_t)
+
+    sess = tf.get_default_session()
+    action0, l3_ = sess.run([self.q_action, self.l3], feed_dict={self.s_t: [s_t]})
+    l3 = l3_[0]
+
+    if random.random() < ep:
+      action = random.randrange(self.env.action_size)
+    else:
+      action = action0[0]
+
+    return action, l3
+
   def observe(self, screen, reward, action, terminal):
     reward = max(self.min_reward, min(self.max_reward, reward))
     self.history.add(screen)
@@ -464,10 +482,6 @@ class Agent(BaseModel):
       monitor = gym.wrappers.Monitor(self.env.env, gym_dir)
     else:
       monitor = self.env.env
-      height = 110
-      width = 84
-      window = pyglet.window.Window(width=width, height=height)
-
       # cv2.startWindowThread()
       # cv2.namedWindow("view")
 
@@ -486,7 +500,7 @@ class Agent(BaseModel):
 
       for t in range(n_step):
         # 1. predict
-        action = self.predict(test_history.get(), test_ep)
+        action, l3 = self.predict2(test_history.get(), test_ep)
         # 2. act
         screen, reward, terminal, _ = monitor.step(action)
         print t, action, ACTION_MEANING[action], reward
@@ -497,7 +511,9 @@ class Agent(BaseModel):
           monitor.render()
 
           # img = np.broadcast_to(arr.T, (3, arr.shape[1], arr.shape[0])).T
-          my_imshow(window, org_screen, 3)
+          # my_imshow('org_screen', org_screen, 3)
+          v_l3 = np.array([l3.T[0:21].mean(axis=0) , l3.T[21:42].mean(axis=0), l3.T[42:64].mean(axis=0)]).T
+          my_imshow('l3', v_l3, 70)
 
           # plt.imshow(screen)
           # plt.show()
