@@ -33,6 +33,7 @@ class Agent(BaseModel):
     self.memory = DataSet(self.config, np.random.RandomState())
     self.ep_transition_cache = []
     self.ep_steps = 0
+    self.psc_reward = 0
     with tf.variable_scope('step'):
       self.step_op = tf.Variable(0, trainable=False, name='step')
       self.step_input = tf.placeholder('int32', None, name='step_input')
@@ -67,7 +68,9 @@ class Agent(BaseModel):
     for _ in range(self.history_length):
       self.history.add(screen)
 
-    for self.step in tqdm(range(start_step, self.max_step), ncols=70, initial=start_step):
+    t = tqdm(range(start_step, self.max_step), ncols=100, initial=start_step)
+    for self.step in t:
+      t.set_postfix(psc_reward="%2.6f"%(self.psc_reward))
       if self.step == self.learn_start:
         num_game, self.update_count, ep_reward = 0, 0, 0.
         total_reward, self.total_loss, self.total_q = 0., 0., 0.

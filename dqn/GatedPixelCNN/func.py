@@ -77,7 +77,7 @@ def collect_samples(batch_size, env, action_n, ob_shape=(42, 42)):
         samples.append(s)
         # temporally ignore reward
     samples = np.array(samples).reshape((batch_size,) + ob_shape + (1,))
-    q_fun = preprocess(8)
+    q_fun = preprocess(conf.q_levels)
     return q_fun(samples)
 
 # I would find the value range of the image.
@@ -88,7 +88,7 @@ def process_density_images(image):
 
 def process_density_input(samples):
     # NHWC thx!
-    q_func = preprocess(8)
+    q_func = preprocess(conf.q_levels)
     return q_func(samples)
 
 def get_network(dens_scope):
